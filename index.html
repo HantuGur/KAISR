@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kasir Bengkel — Maju Jaya Motor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo-icon">🔧</div>
+    <div>
+      <h1 class="header-title">Bengkel Maju Jaya Motor</h1>
+      <p class="header-sub" id="clock">Memuat waktu...</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="nav-btn active" onclick="showPage('kasir')" id="btn-kasir">🛒 Kasir</button>
+    <button class="nav-btn" onclick="showPage('stok')" id="btn-stok">📦 Stok Barang</button>
+    <button class="nav-btn" onclick="showPage('laporan')" id="btn-laporan">📊 Laporan</button>
+  </div>
+</header>
+
+<!-- ===== PAGE: KASIR ===== -->
+<div id="page-kasir" class="page active">
+  <div class="kasir-layout">
+
+    <!-- Kolom kiri: Katalog Produk -->
+    <div class="catalog-panel">
+      <div class="panel-header">
+        <h2>📋 Pilih Barang / Jasa</h2>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Cari barang..." oninput="filterProducts()" />
+        </div>
+      </div>
+
+      <!-- Tab Kategori -->
+      <div class="category-tabs" id="categoryTabs"></div>
+
+      <!-- Grid Produk -->
+      <div class="product-grid" id="productGrid"></div>
+    </div>
+
+    <!-- Kolom kanan: Keranjang & Bayar -->
+    <div class="cart-panel">
+      <div class="panel-header">
+        <h2>🧾 Struk Belanja</h2>
+        <div class="cashier-info">
+          <label>Nama Pembeli:</label>
+          <input type="text" id="buyerName" placeholder="Kosongkan jika tidak perlu" />
+        </div>
+      </div>
+
+      <div class="cart-list" id="cartList">
+        <div class="cart-empty">
+          <span>🛒</span>
+          <p>Belum ada barang dipilih</p>
+          <small>Klik tombol barang di sebelah kiri</small>
+        </div>
+      </div>
+
+      <div class="cart-footer">
+        <div class="subtotal-row">
+          <span>Subtotal:</span>
+          <span id="subtotal">Rp 0</span>
+        </div>
+        <div class="discount-row">
+          <label>Diskon (%):</label>
+          <input type="number" id="discountInput" value="0" min="0" max="100" onchange="updateCart()" />
+        </div>
+        <div class="total-row">
+          <span>TOTAL BAYAR:</span>
+          <span id="totalDisplay">Rp 0</span>
+        </div>
+        <div class="bayar-row">
+          <label>Uang Diterima:</label>
+          <input type="number" id="cashInput" placeholder="0" oninput="hitungKembalian()" />
+        </div>
+        <div class="kembalian-row" id="kembalianRow">
+          <span>Kembalian:</span>
+          <span id="kembalianDisplay">Rp 0</span>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-clear" onclick="clearCart()">🗑️ Kosongkan</button>
+          <button class="btn-pay" onclick="processPayment()" id="btnBayar">✅ BAYAR SEKARANG</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== PAGE: STOK ===== -->
+<div id="page-stok" class="page">
+  <div class="stok-layout">
+    <div class="stok-header">
+      <h2>📦 Manajemen Stok Barang</h2>
+      <button class="btn-add-stok" onclick="openAddProduct()">➕ Tambah Barang Baru</button>
+    </div>
+
+    <div class="stok-stats" id="stokStats"></div>
+
+    <div class="stok-table-wrap">
+      <table class="stok-table" id="stokTable">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Barang</th>
+            <th>Kategori</th>
+            <th>Harga</th>
+            <th>Stok</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="stokBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: LAPORAN ===== -->
+<div id="page-laporan" class="page">
+  <div class="laporan-layout">
+    <h2>📊 Laporan Keuangan</h2>
+
+    <div class="laporan-tabs">
+      <button class="lap-tab active" onclick="switchLaporan('harian', this)">📅 Harian</button>
+      <button class="lap-tab" onclick="switchLaporan('bulanan', this)">📆 Bulanan</button>
+      <button class="lap-tab" onclick="switchLaporan('tren', this)">📈 Tren Laba</button>
+      <button class="lap-tab" onclick="switchLaporan('riwayat', this)">📜 Riwayat Transaksi</button>
+    </div>
+
+    <!-- Laporan Harian -->
+    <div id="lap-harian" class="lap-content active">
+      <div class="date-picker-row">
+        <label>Pilih Tanggal:</label>
+        <input type="date" id="datePickerHarian" onchange="renderHarian()" />
+      </div>
+      <div class="summary-cards" id="harianCards"></div>
+      <div class="chart-wrap">
+        <canvas id="chartHarian" height="100"></canvas>
+      </div>
+    </div>
+
+    <!-- Laporan Bulanan -->
+    <div id="lap-bulanan" class="lap-content">
+      <div class="date-picker-row">
+        <label>Pilih Bulan:</label>
+        <input type="month" id="monthPickerBulanan" onchange="renderBulanan()" />
+      </div>
+      <div class="summary-cards" id="bulananCards"></div>
+      <div class="chart-wrap">
+        <canvas id="chartBulanan" height="100"></canvas>
+      </div>
+    </div>
+
+    <!-- Tren Laba -->
+    <div id="lap-tren" class="lap-content">
+      <div class="tren-info-box" id="trenInfo"></div>
+      <div class="summary-cards" id="trenCards"></div>
+      <div class="chart-wrap">
+        <canvas id="chartTren" height="120"></canvas>
+      </div>
+    </div>
+
+    <!-- Riwayat Transaksi -->
+    <div id="lap-riwayat" class="lap-content">
+      <div class="riwayat-filter">
+        <input type="text" id="searchRiwayat" placeholder="🔍 Cari transaksi..." oninput="renderRiwayat()" />
+        <button onclick="exportCSV()" class="btn-export">📥 Export CSV</button>
+        <button onclick="if(confirm('Hapus SEMUA riwayat?')) { clearHistory(); }" class="btn-danger-sm">🗑️ Hapus Semua</button>
+      </div>
+      <div id="riwayatList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== MODAL: Tambah/Edit Produk ===== -->
+<div class="modal-overlay" id="modalProduct" onclick="closeModal(event)">
+  <div class="modal-box">
+    <h3 id="modalTitle">➕ Tambah Barang Baru</h3>
+    <div class="form-grid">
+      <label>Nama Barang:</label>
+      <input type="text" id="pName" placeholder="Contoh: Oli Mesin Shell" />
+      <label>Kategori:</label>
+      <select id="pCategory">
+        <option value="Oli & Pelumas">Oli & Pelumas</option>
+        <option value="Kampas & Rem">Kampas & Rem</option>
+        <option value="Filter">Filter</option>
+        <option value="Aki & Listrik">Aki & Listrik</option>
+        <option value="Kaki-kaki">Kaki-kaki</option>
+        <option value="Jasa Service">Jasa Service</option>
+        <option value="Aksesoris">Aksesoris</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
+      <label>Harga (Rp):</label>
+      <input type="number" id="pPrice" placeholder="Contoh: 75000" min="0" />
+      <label>Stok Awal:</label>
+      <input type="number" id="pStock" placeholder="Contoh: 20" min="0" />
+      <label>Ikon Emoji:</label>
+      <input type="text" id="pIcon" placeholder="Contoh: 🔧" maxlength="4" />
+      <label>Stok Minimum Alert:</label>
+      <input type="number" id="pMinStock" placeholder="Contoh: 5" min="0" />
+    </div>
+    <input type="hidden" id="pEditId" value="" />
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="document.getElementById('modalProduct').style.display='none'">✖ Batal</button>
+      <button class="btn-save" onclick="saveProduct()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Sukses Bayar ===== -->
+<div class="modal-overlay" id="modalSukses" style="display:none">
+  <div class="modal-box sukses-box">
+    <div class="sukses-icon">✅</div>
+    <h3>Pembayaran Berhasil!</h3>
+    <div id="suksesSummary"></div>
+    <div class="modal-actions">
+      <button class="btn-print" onclick="cetakStruk()">🖨️ Cetak Struk</button>
+      <button class="btn-save" onclick="document.getElementById('modalSukses').style.display='none'">OK, Lanjut</button>
+    </div>
+  </div>
+</div>
+
+<!-- Print Area (hidden) -->
+<div id="printArea" style="display:none"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
