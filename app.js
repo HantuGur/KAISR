@@ -231,41 +231,50 @@ function removeFromCart(productId) {
 function clearCart() {
   if (cart.length && !confirm('Kosongkan semua barang di keranjang?')) return;
   cart = [];
-  document.getElementById('cashInput').value = '';
+  document.getElementById('cashInput').value     = '';
   document.getElementById('discountInput').value = '0';
-  document.getElementById('buyerName').value = '';
+  document.getElementById('buyerName').value     = '';
+  document.getElementById('cartBadge').style.display = 'none';
   updateCart();
 }
 
 function updateCart() {
   const cartList = document.getElementById('cartList');
+  const badge    = document.getElementById('cartBadge');
+  const totalItems = cart.reduce((s, i) => s + i.qty, 0);
 
   if (!cart.length) {
     cartList.innerHTML = `
       <div class="cart-empty">
         <span>🛒</span>
-        <p>Belum ada barang dipilih</p>
-        <small>Klik tombol barang di sebelah kiri</small>
+        <p>Keranjang masih kosong</p>
+        <small>Klik barang di sebelah kiri</small>
       </div>`;
+    badge.style.display = 'none';
     document.getElementById('subtotal').textContent    = 'Rp 0';
     document.getElementById('totalDisplay').textContent = 'Rp 0';
-    document.getElementById('kembalianDisplay').textContent = 'Rp 0';
+    document.getElementById('kembalianDisplay').textContent = '—';
+    document.getElementById('kembalianDisplay').style.color = 'var(--green)';
     document.getElementById('btnBayar').disabled = true;
     return;
   }
+
+  badge.style.display = 'inline';
+  badge.textContent   = totalItems + ' item';
 
   cartList.innerHTML = cart.map(item => `
     <div class="cart-item">
       <span class="ci-icon">${item.icon}</span>
       <div class="ci-info">
-        <div class="ci-name">${item.name}</div>
-        <div class="ci-price">${formatRp(item.price)} × ${item.qty} = ${formatRp(item.price * item.qty)}</div>
+        <div class="ci-name" title="${item.name}">${item.name}</div>
+        <div class="ci-price">${formatRp(item.price)} × ${item.qty}</div>
+        <div class="ci-subtotal">= ${formatRp(item.price * item.qty)}</div>
       </div>
       <div class="ci-qty">
-        <button class="qty-btn" onclick="changeQty('${item.id}', -1)">−</button>
+        <button class="qty-btn" onclick="changeQty('${item.id}', -1)" title="Kurangi">−</button>
         <span class="qty-num">${item.qty}</span>
-        <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
-        <button class="qty-btn remove" onclick="removeFromCart('${item.id}')">✕</button>
+        <button class="qty-btn" onclick="changeQty('${item.id}', 1)" title="Tambah">+</button>
+        <button class="qty-btn remove" onclick="removeFromCart('${item.id}')" title="Hapus">✕</button>
       </div>
     </div>`).join('');
 
@@ -283,11 +292,19 @@ function hitungKembalian() {
   const discount = Math.min(Math.max(parseFloat(document.getElementById('discountInput').value) || 0, 0), 100);
   const subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const total    = Math.round(subtotal * (1 - discount / 100));
-  const cash     = parseFloat(document.getElementById('cashInput').value) || 0;
+  const cashRaw  = document.getElementById('cashInput').value;
+  const el       = document.getElementById('kembalianDisplay');
+
+  if (!cashRaw || cashRaw === '' || cashRaw === '0') {
+    el.textContent = '—';
+    el.style.color = 'var(--gray)';
+    return;
+  }
+
+  const cash      = parseFloat(cashRaw) || 0;
   const kembalian = cash - total;
-  const el = document.getElementById('kembalianDisplay');
-  el.textContent = kembalian >= 0 ? formatRp(kembalian) : '❌ Kurang ' + formatRp(Math.abs(kembalian));
-  el.style.color = kembalian >= 0 ? 'var(--green)' : 'var(--red)';
+  el.textContent  = kembalian >= 0 ? formatRp(kembalian) : '❌ Kurang ' + formatRp(Math.abs(kembalian));
+  el.style.color  = kembalian >= 0 ? 'var(--green)' : 'var(--red)';
 }
 
 // ====================================================

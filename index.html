@@ -50,18 +50,18 @@
     <!-- Kolom kanan: Keranjang & Bayar -->
     <div class="cart-panel">
       <div class="panel-header">
-        <h2>🧾 Struk Belanja</h2>
+        <h2>🧾 Struk Belanja <span class="cart-count-badge" id="cartBadge" style="display:none">0</span></h2>
         <div class="cashier-info">
-          <label>Nama Pembeli:</label>
-          <input type="text" id="buyerName" placeholder="Kosongkan jika tidak perlu" />
+          <label>👤 Pembeli:</label>
+          <input type="text" id="buyerName" placeholder="Nama pembeli (opsional)" />
         </div>
       </div>
 
       <div class="cart-list" id="cartList">
         <div class="cart-empty">
           <span>🛒</span>
-          <p>Belum ada barang dipilih</p>
-          <small>Klik tombol barang di sebelah kiri</small>
+          <p>Keranjang masih kosong</p>
+          <small>Klik barang di sebelah kiri</small>
         </div>
       </div>
 
@@ -70,26 +70,32 @@
           <span>Subtotal:</span>
           <span id="subtotal">Rp 0</span>
         </div>
-        <div class="discount-row">
-          <label>Diskon (%):</label>
-          <input type="number" id="discountInput" value="0" min="0" max="100" onchange="updateCart()" />
+
+        <!-- Diskon & Uang Diterima dalam 2 kolom -->
+        <div class="footer-inputs">
+          <div class="footer-input-group">
+            <label>🏷️ Diskon (%)</label>
+            <input type="number" id="discountInput" value="0" min="0" max="100" oninput="updateCart()" placeholder="0" />
+          </div>
+          <div class="footer-input-group">
+            <label>💵 Uang Diterima</label>
+            <input type="number" id="cashInput" placeholder="0" oninput="hitungKembalian()" />
+          </div>
         </div>
+
         <div class="total-row">
           <span>TOTAL BAYAR:</span>
           <span id="totalDisplay">Rp 0</span>
         </div>
-        <div class="bayar-row">
-          <label>Uang Diterima:</label>
-          <input type="number" id="cashInput" placeholder="0" oninput="hitungKembalian()" />
-        </div>
+
         <div class="kembalian-row" id="kembalianRow">
-          <span>Kembalian:</span>
-          <span id="kembalianDisplay">Rp 0</span>
+          <span>💰 Kembalian:</span>
+          <span id="kembalianDisplay">—</span>
         </div>
 
         <div class="action-buttons">
           <button class="btn-clear" onclick="clearCart()">🗑️ Kosongkan</button>
-          <button class="btn-pay" onclick="processPayment()" id="btnBayar">✅ BAYAR SEKARANG</button>
+          <button class="btn-pay" onclick="processPayment()" id="btnBayar" disabled>✅ BAYAR SEKARANG</button>
         </div>
       </div>
     </div>
