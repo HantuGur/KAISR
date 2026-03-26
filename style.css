@@ -1018,6 +1018,15 @@ input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(232,100,12
 ::-webkit-scrollbar-track { background: var(--cream2); }
 ::-webkit-scrollbar-thumb { background: var(--orange-lt); border-radius: 10px; }
 
+/* =================== MOBILE-ONLY ELEMENTS — hidden on desktop =================== */
+.bottom-nav,
+.cart-sheet-overlay,
+.cart-sheet {
+  display: none !important;
+}
+/* FAB controlled by JS, just default hidden without !important */
+.fab-cart { display: none; }
+
 /* =================== RESPONSIVE — TABLET =================== */
 @media (max-width: 1000px) {
   .kasir-layout {
@@ -1052,9 +1061,13 @@ input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(232,100,12
   /* Sembunyikan nav header di HP — diganti bottom nav */
   .header-right { display: none; }
 
+  /* ── Tampilkan elemen mobile yang disembunyikan di desktop ── */
+  .bottom-nav { display: flex !important; }
+  .cart-sheet-overlay.open { display: block !important; }
+  .cart-sheet { display: flex !important; }
+
   /* ── Bottom Navigation ── */
   .bottom-nav {
-    display: flex !important;
     position: fixed;
     bottom: 0; left: 0; right: 0;
     background: var(--white);
@@ -1148,7 +1161,6 @@ input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(232,100,12
 
   /* ── Floating Cart Button ── */
   .fab-cart {
-    display: flex !important;
     position: fixed;
     bottom: 70px;
     right: 16px;
