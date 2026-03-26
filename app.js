@@ -903,18 +903,33 @@ function updateFAB() {
 
 // ── Buka sheet ──
 function openCartSheet() {
+  if (!isMobile()) return;
   document.getElementById('sheetBuyerName').value = document.getElementById('buyerName')?.value || '';
   document.getElementById('sheetDiscount').value  = document.getElementById('discountInput')?.value || '0';
   renderSheetCart();
-  document.getElementById('cartSheetOverlay').classList.add('open');
-  document.getElementById('cartSheet').classList.add('open');
+  const overlay = document.getElementById('cartSheetOverlay');
+  const sheet   = document.getElementById('cartSheet');
+  overlay.style.display = 'block';
+  sheet.style.display   = 'flex';
+  // Trigger animasi setelah display:flex diterapkan
+  requestAnimationFrame(() => {
+    overlay.classList.add('open');
+    sheet.classList.add('open');
+  });
   document.body.style.overflow = 'hidden';
 }
 
 // ── Tutup sheet ──
 function closeCartSheet() {
-  document.getElementById('cartSheetOverlay').classList.remove('open');
-  document.getElementById('cartSheet').classList.remove('open');
+  const overlay = document.getElementById('cartSheetOverlay');
+  const sheet   = document.getElementById('cartSheet');
+  overlay.classList.remove('open');
+  sheet.classList.remove('open');
+  // Sembunyikan setelah animasi selesai
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    sheet.style.display   = 'none';
+  }, 340);
   document.body.style.overflow = '';
 }
 

@@ -1064,7 +1064,7 @@ input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(232,100,12
   /* ── Tampilkan elemen mobile yang disembunyikan di desktop ── */
   .bottom-nav { display: flex !important; }
   .cart-sheet-overlay.open { display: block !important; }
-  .cart-sheet { display: flex !important; }
+  .cart-sheet { display: flex !important; flex-direction: column; }
 
   /* ── Bottom Navigation ── */
   .bottom-nav {

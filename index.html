@@ -241,7 +241,7 @@
 <!-- Print Area (hidden) -->
 <div id="printArea" style="display:none"></div>
 
-<!-- ===== MOBILE: Bottom Navigation ===== -->
+<!-- ===== MOBILE ONLY: Bottom Navigation ===== -->
 <nav class="bottom-nav" style="display:none">
   <button class="bnav-btn active" onclick="showPage('kasir')" id="bnav-kasir">
     <span class="bnav-icon">🛒</span>Kasir
@@ -254,16 +254,16 @@
   </button>
 </nav>
 
-<!-- ===== MOBILE: Floating Cart Button ===== -->
+<!-- ===== MOBILE ONLY: Floating Cart Button ===== -->
 <button class="fab-cart" style="display:none" onclick="openCartSheet()" id="fabCart">
   <span class="fab-cart-icon">🛒</span>
   <span class="fab-cart-count" id="fabCount">0</span>
   <span class="fab-cart-total" id="fabTotal">Rp 0</span>
 </button>
 
-<!-- ===== MOBILE: Cart Bottom Sheet ===== -->
-<div class="cart-sheet-overlay" id="cartSheetOverlay" onclick="closeCartSheet()"></div>
-<div class="cart-sheet" id="cartSheet">
+<!-- ===== MOBILE ONLY: Cart Bottom Sheet ===== -->
+<div class="cart-sheet-overlay" id="cartSheetOverlay" style="display:none" onclick="closeCartSheet()"></div>
+<div class="cart-sheet" id="cartSheet" style="display:none">
   <div class="cart-sheet-handle"></div>
   <div class="cart-sheet-header">
     <h3>🧾 Struk Belanja <span class="cart-count-badge" id="sheetBadge"></span></h3>
@@ -274,7 +274,7 @@
     <input type="text" id="sheetBuyerName" placeholder="Nama pembeli (opsional)" />
   </div>
   <div class="cart-sheet-list" id="sheetCartList">
-    <div style="text-align:center;padding:24px;color:var(--gray);font-weight:700">Keranjang kosong</div>
+    <div style="text-align:center;padding:24px;color:var(--gray);font-weight:700">🛒 Keranjang masih kosong</div>
   </div>
   <div class="cart-sheet-footer">
     <div class="sheet-subtotal-row">
