@@ -861,3 +861,169 @@ function avg(arr) {
   if (!filtered.length) return 0;
   return filtered.reduce((s, x) => s + x, 0) / filtered.length;
 }
+
+// ====================================================
+// MOBILE — Bottom Sheet Cart & Navigation
+// Semua fungsi ini HANYA aktif di layar ≤ 600px
+// ====================================================
+
+const isMobile = () => window.innerWidth <= 600;
+
+// ── Wrap showPage agar sync bottom nav ──
+const _origShowPage = showPage;
+showPage = function(page) {
+  _origShowPage(page);
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  const bnav = document.getElementById('bnav-' + page);
+  if (bnav) bnav.classList.add('active');
+  const fab = document.getElementById('fabCart');
+  if (fab) fab.style.display = (page === 'kasir' && isMobile() && cart.length > 0) ? 'flex' : 'none';
+};
+
+// ── Wrap addToCart, changeQty, removeFromCart ──
+const _origAddToCart = addToCart;
+addToCart = function(id) { _origAddToCart(id); if (isMobile()) updateFAB(); };
+
+const _origChangeQty = changeQty;
+changeQty = function(id, delta) { _origChangeQty(id, delta); if (isMobile()) { updateFAB(); renderSheetCart(); } };
+
+const _origRemoveFromCart = removeFromCart;
+removeFromCart = function(id) { _origRemoveFromCart(id); if (isMobile()) { updateFAB(); renderSheetCart(); } };
+
+// ── FAB update ──
+function updateFAB() {
+  const fab = document.getElementById('fabCart');
+  if (!fab) return;
+  const totalItems = cart.reduce((s, i) => s + i.qty, 0);
+  const subtotal   = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  fab.style.display = (cart.length > 0 && isMobile()) ? 'flex' : 'none';
+  document.getElementById('fabCount').textContent = totalItems + ' item';
+  document.getElementById('fabTotal').textContent = formatRp(subtotal);
+}
+
+// ── Buka sheet ──
+function openCartSheet() {
+  document.getElementById('sheetBuyerName').value = document.getElementById('buyerName')?.value || '';
+  document.getElementById('sheetDiscount').value  = document.getElementById('discountInput')?.value || '0';
+  renderSheetCart();
+  document.getElementById('cartSheetOverlay').classList.add('open');
+  document.getElementById('cartSheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// ── Tutup sheet ──
+function closeCartSheet() {
+  document.getElementById('cartSheetOverlay').classList.remove('open');
+  document.getElementById('cartSheet').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── Render isi sheet ──
+function renderSheetCart() {
+  const list   = document.getElementById('sheetCartList');
+  const badge  = document.getElementById('sheetBadge');
+  const totalItems = cart.reduce((s, i) => s + i.qty, 0);
+  badge.textContent = totalItems + ' item';
+
+  if (!cart.length) {
+    list.innerHTML = '<div style="text-align:center;padding:28px;color:var(--gray);font-weight:700">🛒 Keranjang masih kosong</div>';
+    document.getElementById('sheetBtnBayar').disabled = true;
+    updateSheetTotals();
+    return;
+  }
+
+  list.innerHTML = cart.map(item => `
+    <div class="sheet-item">
+      <span class="ci-icon">${item.icon}</span>
+      <div class="ci-info">
+        <div class="ci-name" title="${item.name}">${item.name}</div>
+        <div class="ci-price">${formatRp(item.price)} × ${item.qty}</div>
+        <div class="ci-subtotal">= ${formatRp(item.price * item.qty)}</div>
+      </div>
+      <div class="ci-qty">
+        <button class="qty-btn" onclick="changeQtySheet('${item.id}',-1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQtySheet('${item.id}',1)">+</button>
+        <button class="qty-btn remove" onclick="removeFromCartSheet('${item.id}')">✕</button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('sheetBtnBayar').disabled = false;
+  updateSheetTotals();
+}
+
+function changeQtySheet(id, delta) {
+  const idx = cart.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  updateFAB(); renderSheetCart(); updateCart();
+}
+
+function removeFromCartSheet(id) {
+  cart = cart.filter(c => c.id !== id);
+  updateFAB(); renderSheetCart(); updateCart();
+}
+
+function updateSheetCart()   { updateSheetTotals(); hitungSheetKembalian(); }
+
+function updateSheetTotals() {
+  const sub  = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const disc = Math.min(Math.max(parseFloat(document.getElementById('sheetDiscount')?.value) || 0, 0), 100);
+  const tot  = Math.round(sub * (1 - disc / 100));
+  document.getElementById('sheetSubtotal').textContent = formatRp(sub);
+  document.getElementById('sheetTotal').textContent    = formatRp(tot);
+}
+
+function hitungSheetKembalian() {
+  const sub  = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const disc = Math.min(Math.max(parseFloat(document.getElementById('sheetDiscount')?.value) || 0, 0), 100);
+  const tot  = Math.round(sub * (1 - disc / 100));
+  const raw  = document.getElementById('sheetCash')?.value || '';
+  const el   = document.getElementById('sheetKembalian');
+  if (!raw || raw === '0') { el.textContent = '—'; el.style.color = 'var(--gray)'; return; }
+  const kem  = (parseFloat(raw) || 0) - tot;
+  el.textContent = kem >= 0 ? formatRp(kem) : '❌ Kurang ' + formatRp(Math.abs(kem));
+  el.style.color = kem >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
+function clearCartMobile() {
+  if (cart.length && !confirm('Kosongkan semua barang?')) return;
+  cart = [];
+  ['sheetCash','sheetDiscount','sheetBuyerName','cashInput','discountInput','buyerName']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = id.includes('iscount') ? '0' : ''; });
+  updateFAB(); renderSheetCart(); updateCart(); closeCartSheet();
+}
+
+function processPaymentMobile() {
+  if (!cart.length) return;
+  // Sync nilai ke field desktop lalu pakai fungsi utama
+  document.getElementById('buyerName').value     = document.getElementById('sheetBuyerName').value;
+  document.getElementById('discountInput').value = document.getElementById('sheetDiscount').value;
+  document.getElementById('cashInput').value     = document.getElementById('sheetCash').value;
+  closeCartSheet();
+  processPayment();
+  updateFAB();
+}
+
+// ── Swipe down tutup sheet ──
+(function() {
+  let startY = 0;
+  document.addEventListener('touchstart', e => {
+    if (document.getElementById('cartSheet')?.contains(e.target)) startY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (!document.getElementById('cartSheet')?.classList.contains('open')) return;
+    if (e.changedTouches[0].clientY - startY > 80) closeCartSheet();
+  }, { passive: true });
+})();
+
+window.addEventListener('resize', () => {
+  if (!isMobile()) {
+    closeCartSheet();
+    const fab = document.getElementById('fabCart');
+    if (fab) fab.style.display = 'none';
+  } else {
+    updateFAB();
+  }
+});

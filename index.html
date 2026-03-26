@@ -241,6 +241,71 @@
 <!-- Print Area (hidden) -->
 <div id="printArea" style="display:none"></div>
 
+<!-- ===== MOBILE: Bottom Navigation ===== -->
+<nav class="bottom-nav" style="display:none">
+  <button class="bnav-btn active" onclick="showPage('kasir')" id="bnav-kasir">
+    <span class="bnav-icon">🛒</span>Kasir
+  </button>
+  <button class="bnav-btn" onclick="showPage('stok')" id="bnav-stok">
+    <span class="bnav-icon">📦</span>Stok
+  </button>
+  <button class="bnav-btn" onclick="showPage('laporan')" id="bnav-laporan">
+    <span class="bnav-icon">📊</span>Laporan
+  </button>
+</nav>
+
+<!-- ===== MOBILE: Floating Cart Button ===== -->
+<button class="fab-cart" style="display:none" onclick="openCartSheet()" id="fabCart">
+  <span class="fab-cart-icon">🛒</span>
+  <span class="fab-cart-count" id="fabCount">0</span>
+  <span class="fab-cart-total" id="fabTotal">Rp 0</span>
+</button>
+
+<!-- ===== MOBILE: Cart Bottom Sheet ===== -->
+<div class="cart-sheet-overlay" id="cartSheetOverlay" onclick="closeCartSheet()"></div>
+<div class="cart-sheet" id="cartSheet">
+  <div class="cart-sheet-handle"></div>
+  <div class="cart-sheet-header">
+    <h3>🧾 Struk Belanja <span class="cart-count-badge" id="sheetBadge"></span></h3>
+    <button class="cart-sheet-close" onclick="closeCartSheet()">✕</button>
+  </div>
+  <div class="cart-sheet-buyer">
+    <label>👤 Nama:</label>
+    <input type="text" id="sheetBuyerName" placeholder="Nama pembeli (opsional)" />
+  </div>
+  <div class="cart-sheet-list" id="sheetCartList">
+    <div style="text-align:center;padding:24px;color:var(--gray);font-weight:700">Keranjang kosong</div>
+  </div>
+  <div class="cart-sheet-footer">
+    <div class="sheet-subtotal-row">
+      <span>Subtotal:</span>
+      <span id="sheetSubtotal">Rp 0</span>
+    </div>
+    <div class="sheet-inputs">
+      <div class="sheet-input-group">
+        <label>🏷️ Diskon (%)</label>
+        <input type="number" id="sheetDiscount" value="0" min="0" max="100" oninput="updateSheetCart()" placeholder="0" />
+      </div>
+      <div class="sheet-input-group">
+        <label>💵 Uang Diterima</label>
+        <input type="number" id="sheetCash" placeholder="0" oninput="hitungSheetKembalian()" />
+      </div>
+    </div>
+    <div class="sheet-total-row">
+      <span>TOTAL BAYAR:</span>
+      <span id="sheetTotal">Rp 0</span>
+    </div>
+    <div class="sheet-kembalian-row">
+      <span>💰 Kembalian:</span>
+      <span id="sheetKembalian">—</span>
+    </div>
+    <div class="sheet-actions">
+      <button class="sheet-btn-clear" onclick="clearCartMobile()">🗑️ Kosongkan</button>
+      <button class="sheet-btn-pay" id="sheetBtnBayar" onclick="processPaymentMobile()" disabled>✅ BAYAR SEKARANG</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="app.js"></script>
 </body>
